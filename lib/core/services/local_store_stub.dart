@@ -1,16 +1,15 @@
+import 'package:shared_preferences/shared_preferences.dart';
+
 class NafasStoreAdapter {
-  static final Map<String, String> _memory = <String, String>{};
+  final SharedPreferencesAsync _preferences = SharedPreferencesAsync();
 
-  bool get isDurable => false;
-  String get platformLabel => 'حافظه موقت پیش‌نمایش';
+  bool get isDurable => true;
+  String get platformLabel => 'فضای محلی خصوصی برنامه';
 
-  Future<String?> read(String key) async => _memory[key];
+  Future<String?> read(String key) => _preferences.getString(key);
 
-  Future<void> write(String key, String value) async {
-    _memory[key] = value;
-  }
+  Future<void> write(String key, String value) =>
+      _preferences.setString(key, value);
 
-  Future<void> remove(String key) async {
-    _memory.remove(key);
-  }
+  Future<void> remove(String key) => _preferences.remove(key);
 }

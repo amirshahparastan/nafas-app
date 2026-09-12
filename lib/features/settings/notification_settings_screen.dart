@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+
 import '../../core/services/notification_service.dart';
 import '../../core/state/app_state.dart';
 import '../../core/theme/nafas_colors.dart';
+import '../../core/utils/formatters.dart';
 import '../../core/widgets/nafas_buttons.dart';
 import '../../core/widgets/rtl_app_bar.dart';
 
@@ -14,7 +16,7 @@ class NotificationSettingsScreen extends StatefulWidget {
 
 class _NotificationSettingsScreenState extends State<NotificationSettingsScreen> {
   String _permission = 'unknown';
-  bool _loadingPermission = true;
+  bool _loading = true;
 
   @override
   void initState() {
@@ -27,7 +29,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
     if (!mounted) return;
     setState(() {
       _permission = value;
-      _loadingPermission = false;
+      _loading = false;
     });
   }
 
@@ -41,15 +43,13 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
         children: [
           _permissionCard(context),
           const SizedBox(height: 14),
-          _toggle('یادآوری‌های حمایتی', 'پیام‌های کوتاه و غیرآزاردهنده برای ادامه مسیر', state.remindersEnabled, state.toggleReminders),
-          _toggle('هشدار زمان‌های پرریسک', 'بعد از شناخت الگوها، قبل از زمان‌های حساس یادآوری می‌کنیم', state.riskyTimeRemindersEnabled, state.toggleRiskyTimeReminders),
-          _toggle('فعالیت دیوار امید', 'فقط رویدادهای مهم؛ بدون اعلان‌های شلوغ', state.communityNotificationsEnabled, state.toggleCommunityNotifications),
+          _reminderCard(context, state),
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.all(15),
             decoration: BoxDecoration(color: NafasColors.surfaceSoft, borderRadius: BorderRadius.circular(18)),
             child: const Text(
-              'اصل اعلان در نفس: کم، مفید و قابل‌کنترل. در لحظه هوس هیچ اعلان تبلیغاتی نمایش داده نمی‌شود. زمان‌بندی واقعی اندروید بعد از تکمیل Android SDK به سرویس محلی سیستم متصل می‌شود.',
+              'نسخه ۱.۰ فقط از یادآوری محلی و اختیاری استفاده می‌کند. اعلان تبلیغاتی یا Push سروری در این نسخه فعال نیست و یادآوری روزانه بعد از زمان‌بندی بدون اینترنت هم کار می‌کند.',
               style: TextStyle(height: 1.7, fontWeight: FontWeight.w600),
             ),
           ),
@@ -61,21 +61,16 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
   Widget _permissionCard(BuildContext context) {
     final supported = NafasNotificationService.supported;
     final granted = _permission == 'granted';
-    final denied = _permission == 'denied';
     final title = !supported
-        ? 'اعلان در این پیش‌نمایش در دسترس نیست'
+        ? 'اعلان در این پلتفرم در دسترس نیست'
         : granted
             ? 'مجوز اعلان فعاله'
-            : denied
-                ? 'مجوز اعلان غیرفعاله'
-                : 'اجازه اعلان هنوز گرفته نشده';
+            : 'برای یادآوری باید اجازه اعلان بدی';
     final subtitle = !supported
-        ? 'روی Android/iOS با اتصال سرویس اعلان فعال می‌شود.'
+        ? 'قابلیت یادآوری روزانه در نسخه Android فعال است.'
         : granted
-            ? 'می‌تونی یک اعلان آزمایشی بفرستی و مطمئن بشی مرورگر اجازه نمایش داره.'
-            : denied
-                ? 'از تنظیمات مرورگر باید اجازه اعلان برای این سایت را فعال کنی.'
-                : 'اجازه را فقط وقتی می‌گیریم که خودت بخوای؛ نه در اولین ثانیه نصب.';
+            ? 'نفس فقط اعلان‌هایی را نمایش می‌دهد که خودت فعال کرده باشی.'
+            : 'اجازه فقط با انتخاب خودت درخواست می‌شود و هر زمان بخواهی می‌توانی از تنظیمات گوشی خاموشش کنی.';
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -102,13 +97,13 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                   children: [
                     Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 16)),
                     const SizedBox(height: 3),
-                    Text(subtitle, style: TextStyle(color: Colors.white.withValues(alpha: .73), fontSize: 12.5, height: 1.55)),
+                    Text(subtitle, style: TextStyle(color: Colors.white.withValues(alpha: .75), fontSize: 12.5, height: 1.55)),
                   ],
                 ),
               ),
             ],
           ),
-          if (_loadingPermission) ...[
+          if (_loading) ...[
             const SizedBox(height: 14),
             const LinearProgressIndicator(minHeight: 4),
           ] else if (supported) ...[
@@ -117,17 +112,13 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: NafasColors.primaryDark,
-                    side: BorderSide.none,
-                  ),
+                  style: OutlinedButton.styleFrom(backgroundColor: Colors.white, foregroundColor: NafasColors.primaryDark, side: BorderSide.none),
                   onPressed: () async {
                     final value = await NafasNotificationService.requestPermission();
                     if (!mounted) return;
                     setState(() => _permission = value);
                   },
-                  child: const Text('درخواست مجوز اعلان'),
+                  child: const Text('اجازه اعلان'),
                 ),
               )
             else
@@ -138,7 +129,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                   final ok = await NafasNotificationService.showTestNotification();
                   if (!context.mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(ok ? 'اعلان آزمایشی ارسال شد.' : 'مرورگر اجازه نمایش اعلان را نداد.')),
+                    SnackBar(content: Text(ok ? 'اعلان آزمایشی ارسال شد.' : 'نمایش اعلان ممکن نشد. مجوز اعلان را بررسی کن.')),
                   );
                 },
               ),
@@ -148,26 +139,95 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
     );
   }
 
-  Widget _toggle(String title, String subtitle, bool value, ValueChanged<bool> onChanged) {
+  Widget _reminderCard(BuildContext context, NafasAppState state) {
+    final scheduling = NafasNotificationService.supportsScheduling;
+    final timeLabel = '${faDigits(state.reminderHour.toString().padLeft(2, '0'))}:${faDigits(state.reminderMinute.toString().padLeft(2, '0'))}';
+
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(19), border: Border.all(color: NafasColors.border)),
-      child: Row(
+      padding: const EdgeInsets.all(15),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20), border: Border.all(color: NafasColors.border)),
+      child: Column(
         children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: const TextStyle(fontWeight: FontWeight.w900)),
-                const SizedBox(height: 2),
-                Text(subtitle, style: const TextStyle(color: NafasColors.textSecondary, fontSize: 12.5, height: 1.55)),
-              ],
-            ),
+          Row(
+            children: [
+              Container(width: 44, height: 44, decoration: BoxDecoration(color: NafasColors.surfaceSoft, borderRadius: BorderRadius.circular(14)), child: const Icon(Icons.schedule_rounded, color: NafasColors.primary)),
+              const SizedBox(width: 11),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('یادآوری حمایتی روزانه', style: TextStyle(fontWeight: FontWeight.w900)),
+                    const SizedBox(height: 2),
+                    Text(scheduling ? 'یک پیام کوتاه در ساعت دلخواه؛ بدون نیاز به اینترنت' : 'زمان‌بندی روزانه در نسخه Android فعال است.', style: Theme.of(context).textTheme.bodySmall),
+                  ],
+                ),
+              ),
+              Switch(
+                value: scheduling && state.remindersEnabled,
+                onChanged: scheduling ? (value) => _toggleReminder(context, state, value) : null,
+              ),
+            ],
           ),
-          Switch(value: value, onChanged: onChanged),
+          if (scheduling) ...[
+            const Divider(height: 24),
+            InkWell(
+              onTap: () => _pickTime(context, state),
+              borderRadius: BorderRadius.circular(14),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 7),
+                child: Row(
+                  children: [
+                    const Icon(Icons.access_time_rounded, color: NafasColors.primary),
+                    const SizedBox(width: 9),
+                    const Expanded(child: Text('ساعت یادآوری', style: TextStyle(fontWeight: FontWeight.w800))),
+                    Text(timeLabel, textDirection: TextDirection.ltr, style: const TextStyle(fontWeight: FontWeight.w900, color: NafasColors.primary)),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );
+  }
+
+  Future<void> _toggleReminder(BuildContext context, NafasAppState state, bool value) async {
+    if (!value) {
+      await NafasNotificationService.cancelDailySupportReminder();
+      state.toggleReminders(false);
+      return;
+    }
+
+    var permission = await NafasNotificationService.permissionStatus();
+    if (permission != 'granted') {
+      permission = await NafasNotificationService.requestPermission();
+      if (mounted) setState(() => _permission = permission);
+    }
+    if (permission != 'granted') {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('برای فعال‌شدن یادآوری باید اجازه اعلان داده شود.')));
+      return;
+    }
+
+    final scheduled = await NafasNotificationService.scheduleDailySupportReminder(hour: state.reminderHour, minute: state.reminderMinute);
+    if (!context.mounted) return;
+    if (scheduled) {
+      state.toggleReminders(true);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('یادآوری روزانه فعال شد.')));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('زمان‌بندی اعلان ممکن نشد.')));
+    }
+  }
+
+  Future<void> _pickTime(BuildContext context, NafasAppState state) async {
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay(hour: state.reminderHour, minute: state.reminderMinute),
+    );
+    if (picked == null) return;
+    state.updateReminderTime(hour: picked.hour, minute: picked.minute);
+    if (state.remindersEnabled) {
+      await NafasNotificationService.scheduleDailySupportReminder(hour: picked.hour, minute: picked.minute);
+    }
   }
 }

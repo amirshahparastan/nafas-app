@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+
 import '../../core/constants/product_info.dart';
+import '../../core/services/notification_service.dart';
 import '../../core/state/app_state.dart';
 import '../../core/theme/nafas_colors.dart';
 import '../../core/utils/formatters.dart';
@@ -26,7 +28,7 @@ class SettingsScreen extends StatelessWidget {
             const SizedBox(height: 22),
             _section('شخصی‌سازی'),
             _tile(Icons.smoke_free_rounded, 'اطلاعات مصرف و انگیزه', 'مصرف روزانه، قیمت پاکت و دلیل شخصی ترک', onTap: () => Navigator.pushNamed(context, '/smoking-settings')),
-            _tile(Icons.notifications_outlined, 'اعلان‌ها و یادآوری‌ها', 'یادآوری حمایتی و زمان‌های پرریسک', onTap: () => Navigator.pushNamed(context, '/notification-settings')),
+            _tile(Icons.notifications_outlined, 'اعلان‌ها و یادآوری‌ها', 'یادآوری محلی و اختیاری بدون نیاز به اینترنت', onTap: () => Navigator.pushNamed(context, '/notification-settings')),
             const SizedBox(height: 14),
             _section('مسیر ترک'),
             _tile(Icons.calendar_month_rounded, 'تقویم نفس', 'تقویم جلالی با روزهای پاک، هوس و لغزش', onTap: () => Navigator.pushNamed(context, '/calendar')),
@@ -35,16 +37,18 @@ class SettingsScreen extends StatelessWidget {
               Navigator.pop(context);
               state.setTab(3);
             }),
+            _tile(Icons.health_and_safety_outlined, 'اطلاعات سلامت', 'Timeline منبع‌دار بر اساس زمان ترک تو', onTap: () {
+              Navigator.pop(context);
+              state.setTab(1);
+            }),
             _tile(Icons.health_and_safety_rounded, 'کمک و ایمنی', 'فرد مورد اعتماد، کمک تخصصی و اورژانس', onTap: () => Navigator.pushNamed(context, '/help')),
             const SizedBox(height: 14),
-            _section('جامعه و حریم خصوصی'),
-            _tile(Icons.public_rounded, 'پروفایل عمومی دیوار امید', 'نام مستعار و اطلاعاتی که دیگران اجازه دارند ببینند', onTap: () => Navigator.pushNamed(context, '/public-profile')),
-            _tile(Icons.lock_outline_rounded, 'حریم خصوصی و داده‌ها', 'همگام‌سازی، حذف حساب، خروجی داده و قفل برنامه', onTap: () => Navigator.pushNamed(context, '/privacy-settings')),
+            _section('حریم خصوصی'),
+            _tile(Icons.lock_outline_rounded, 'حریم خصوصی و داده‌ها', 'ذخیره محلی، حالت آفلاین و حذف داده‌ها', onTap: () => Navigator.pushNamed(context, '/privacy-settings')),
             const SizedBox(height: 14),
             _section('پشتیبانی'),
             _tile(Icons.support_agent_rounded, 'تماس با پشتیبانی', NafasProductInfo.supportEmail, onTap: () => Navigator.pushNamed(context, '/support')),
             _tile(Icons.rate_review_outlined, 'انتقاد و پیشنهاد', 'پیشنهاد، گزارش مشکل یا تجربه کاربری', onTap: () => Navigator.pushNamed(context, '/feedback')),
-            _tile(Icons.health_and_safety_outlined, 'اطلاعات سلامت', 'محتوای آموزشی؛ جایگزین توصیه پزشکی نیست', onTap: () => _healthInfo(context)),
             const SizedBox(height: 14),
             _section('درباره و قوانین'),
             _tile(Icons.privacy_tip_outlined, 'سیاست حریم خصوصی', 'نحوه نگهداری و استفاده از داده‌های شما', onTap: () => Navigator.pushNamed(context, '/privacy-policy')),
@@ -75,12 +79,7 @@ class SettingsScreen extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Container(
-              width: 54,
-              height: 54,
-              decoration: BoxDecoration(color: Colors.white.withValues(alpha: .13), borderRadius: BorderRadius.circular(18)),
-              child: const Icon(Icons.person_rounded, color: Colors.white, size: 30),
-            ),
+            Container(width: 54, height: 54, decoration: BoxDecoration(color: Colors.white.withValues(alpha: .13), borderRadius: BorderRadius.circular(18)), child: const Icon(Icons.person_rounded, color: Colors.white, size: 30)),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -88,7 +87,7 @@ class SettingsScreen extends StatelessWidget {
                 children: [
                   Text(display, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 17)),
                   const SizedBox(height: 3),
-                  Text(state.isSignedIn ? 'حساب متصل' : 'مهمان • برای پشتیبان‌گیری حساب بساز', style: TextStyle(color: Colors.white.withValues(alpha: .72), fontSize: 12.5)),
+                  Text('نسخه ۱.۰ • داده‌ها روی همین دستگاه ذخیره می‌شوند', style: TextStyle(color: Colors.white.withValues(alpha: .72), fontSize: 12.5)),
                 ],
               ),
             ),
@@ -99,31 +98,19 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Widget _section(String title) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 2, bottom: 8),
-      child: Text(title, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 15, color: NafasColors.textPrimary)),
-    );
-  }
+  Widget _section(String title) => Padding(
+        padding: const EdgeInsets.only(right: 2, bottom: 8),
+        child: Text(title, style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 15, color: NafasColors.textPrimary)),
+      );
 
   Widget _tile(IconData icon, String title, String subtitle, {VoidCallback? onTap}) {
     return Container(
       margin: const EdgeInsets.only(bottom: 9),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(19),
-        border: Border.all(color: NafasColors.border),
-        boxShadow: const [BoxShadow(color: Color(0x06083B34), blurRadius: 16, offset: Offset(0, 7))],
-      ),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(19), border: Border.all(color: NafasColors.border), boxShadow: const [BoxShadow(color: Color(0x06083B34), blurRadius: 16, offset: Offset(0, 7))]),
       child: ListTile(
         onTap: onTap,
         contentPadding: const EdgeInsets.symmetric(horizontal: 13, vertical: 4),
-        leading: Container(
-          width: 42,
-          height: 42,
-          decoration: BoxDecoration(color: NafasColors.surfaceSoft, borderRadius: BorderRadius.circular(13)),
-          child: Icon(icon, color: NafasColors.primary),
-        ),
+        leading: Container(width: 42, height: 42, decoration: BoxDecoration(color: NafasColors.surfaceSoft, borderRadius: BorderRadius.circular(13)), child: Icon(icon, color: NafasColors.primary)),
         title: Text(title, style: const TextStyle(fontWeight: FontWeight.w800)),
         subtitle: Text(subtitle),
         trailing: const NafasDisclosureIcon(),
@@ -131,29 +118,19 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  void _healthInfo(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('اطلاعات سلامت'),
-        content: const Text('نفس ابزار حمایتی ترک سیگار است و جایگزین پزشک یا خدمات اورژانسی نیست. ادعاهای سلامت قبل از انتشار باید منبع معتبر و تاریخ بازبینی داشته باشند.'),
-        actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('باشه'))],
-      ),
-    );
-  }
-
-
   void _confirmReset(BuildContext context, NafasAppState state) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('شروع دوباره؟'),
-        content: const Text('داده‌های ذخیره‌شده محلی به حالت شروع برمی‌گردند و دوباره وارد آنبوردینگ می‌شی.'),
+        content: const Text('داده‌های مسیر ترک این دستگاه پاک می‌شوند و دوباره وارد مرحله شروع برنامه می‌شی.'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('لغو')),
           TextButton(
-            onPressed: () {
-              state.resetForDemo();
+            onPressed: () async {
+              await NafasNotificationService.cancelDailySupportReminder();
+              await state.clearAllLocalData();
+              if (!ctx.mounted) return;
               Navigator.of(ctx).popUntil((route) => route.isFirst);
             },
             child: const Text('شروع دوباره', style: TextStyle(color: NafasColors.danger)),

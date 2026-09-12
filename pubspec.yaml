@@ -1,18 +1,24 @@
 name: nafas_app
-description: Nafas - Persian quit smoking, goal saving and hope community app
+description: Nafas - Persian quit smoking, goal saving and support app
 publish_to: "none"
-version: 1.0.0+9
+version: 1.0.0+10
 
 environment:
-  sdk: '>=3.7.0 <4.0.0'
+  sdk: '>=3.10.0 <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
+  flutter_local_notifications: 19.5.0
+  flutter_timezone: 5.1.0
+  shared_preferences: 2.5.5
+  timezone: 0.10.1
   url_launcher: ^6.3.2
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/branding/nafas_app_icon_1024.png
   fonts:
     - family: Vazirmatn
       fonts:

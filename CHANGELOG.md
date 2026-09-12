@@ -1,3 +1,14 @@
+# 1.0.0+10 — Launch Candidate
+
+- آیکن نهایی نفس (اتود سوم) برای Android/Web/Store assets
+- Package ID نهایی `ir.wearepulse.nafas`
+- ذخیره‌سازی محلی پایدار Android و غیرفعال‌کردن Auto Backup
+- اعلان محلی Android با زمان‌بندی روزانه اختیاری
+- Health Timeline پویا با منبع رسمی WHO
+- دیوار امید به حالت شفاف «به‌زودی» تا آماده‌شدن Backend و moderation
+- پاک‌سازی UI حساب/حریم خصوصی از قابلیت‌های نمایشی
+- آماده‌سازی Release Signing و GitHub workflow امضاشده
+
 # v1.0.0 — Product Identity, Support & Legal
 
 - هویت رسمی محصول: تیم توسعه PULSE و امیرمحمد شاه‌پرستان.

@@ -153,9 +153,7 @@ enum JourneyDayStatus { beforeJourney, future, smokeFree, craving, slip }
 enum AccountProvider { guest, phone, google }
 
 class NafasAppState extends ChangeNotifier {
-  NafasAppState() {
-    _seedHopeWall();
-  }
+  NafasAppState();
 
   static const _storageKey = 'nafas_state_v2';
 
@@ -172,8 +170,10 @@ class NafasAppState extends ChangeNotifier {
   String goalTitle = 'سفر رویایی';
   int goalAmountToman = 10000000;
   bool hasGoal = true;
-  bool remindersEnabled = true;
-  bool riskyTimeRemindersEnabled = true;
+  bool remindersEnabled = false;
+  int reminderHour = 20;
+  int reminderMinute = 0;
+  bool riskyTimeRemindersEnabled = false;
   bool communityNotificationsEnabled = false;
   int selectedMainTab = 0;
 
@@ -287,7 +287,7 @@ class NafasAppState extends ChangeNotifier {
   Future<void> forceSave() => _persist();
 
   Map<String, dynamic> _toJson() => {
-        'schema': 2,
+        'schema': 3,
         'onboardingComplete': onboardingComplete,
         'cigarettesPerDay': cigarettesPerDay,
         'cigarettesPerPack': cigarettesPerPack,
@@ -298,6 +298,8 @@ class NafasAppState extends ChangeNotifier {
         'goalAmountToman': goalAmountToman,
         'hasGoal': hasGoal,
         'remindersEnabled': remindersEnabled,
+        'reminderHour': reminderHour,
+        'reminderMinute': reminderMinute,
         'riskyTimeRemindersEnabled': riskyTimeRemindersEnabled,
         'communityNotificationsEnabled': communityNotificationsEnabled,
         'selectedMainTab': selectedMainTab,
@@ -330,8 +332,11 @@ class NafasAppState extends ChangeNotifier {
     goalTitle = _string(json['goalTitle'], goalTitle);
     goalAmountToman = _int(json['goalAmountToman'], goalAmountToman);
     hasGoal = _bool(json['hasGoal'], hasGoal);
-    remindersEnabled = _bool(json['remindersEnabled'], remindersEnabled);
-    riskyTimeRemindersEnabled = _bool(json['riskyTimeRemindersEnabled'], riskyTimeRemindersEnabled);
+    final schema = _int(json['schema'], 1);
+    remindersEnabled = schema >= 3 ? _bool(json['remindersEnabled'], remindersEnabled) : false;
+    reminderHour = _int(json['reminderHour'], reminderHour).clamp(0, 23).toInt();
+    reminderMinute = _int(json['reminderMinute'], reminderMinute).clamp(0, 59).toInt();
+    riskyTimeRemindersEnabled = false;
     communityNotificationsEnabled = _bool(json['communityNotificationsEnabled'], communityNotificationsEnabled);
     selectedMainTab = _int(json['selectedMainTab'], selectedMainTab).clamp(0, 4).toInt();
     displayName = _string(json['displayName'], displayName);
@@ -359,7 +364,6 @@ class NafasAppState extends ChangeNotifier {
       for (final item in json['hopePosts'] as List) {
         if (item is Map) hopePosts.add(HopePost.fromJson(Map<String, dynamic>.from(item)));
       }
-      if (hopePosts.isEmpty) _seedHopeWall();
     }
   }
 
@@ -497,6 +501,12 @@ class NafasAppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void updateReminderTime({required int hour, required int minute}) {
+    reminderHour = hour.clamp(0, 23).toInt();
+    reminderMinute = minute.clamp(0, 59).toInt();
+    notifyListeners();
+  }
+
   void toggleRiskyTimeReminders(bool value) {
     riskyTimeRemindersEnabled = value;
     notifyListeners();
@@ -566,7 +576,7 @@ class NafasAppState extends ChangeNotifier {
   int slipsOn(DateTime date) => slips.where((item) => sameCalendarDay(item.at, date)).fold(0, (sum, item) => sum + item.count);
   List<JournalEntry> journalOn(DateTime date) => journalEntries.where((item) => sameCalendarDay(item.at, date)).toList(growable: false);
 
-  void resetForDemo() {
+  void resetAllData() {
     onboardingComplete = false;
     cigarettesPerDay = 10;
     cigarettesPerPack = 20;
@@ -576,8 +586,10 @@ class NafasAppState extends ChangeNotifier {
     goalTitle = 'سفر رویایی';
     goalAmountToman = 10000000;
     hasGoal = true;
-    remindersEnabled = true;
-    riskyTimeRemindersEnabled = true;
+    remindersEnabled = false;
+    reminderHour = 20;
+    reminderMinute = 0;
+    riskyTimeRemindersEnabled = false;
     communityNotificationsEnabled = false;
     selectedMainTab = 0;
     displayName = '';
@@ -597,23 +609,20 @@ class NafasAppState extends ChangeNotifier {
     communityShareProgressDefault = true;
     communityShareSavingsDefault = false;
     hopePosts.clear();
-    _seedHopeWall();
     notifyListeners();
   }
 
-  Future<void> clearSavedPreview() async {
+  Future<void> clearAllLocalData() async {
     await NafasLocalStore.instance.remove(_storageKey);
-    resetForDemo();
+    resetAllData();
   }
 
-  void _seedHopeWall() {
-    final now = DateTime.now();
-    hopePosts.addAll([
-      HopePost(id: 'seed-1', authorAlias: 'مسافر ۴۳', message: 'هفته اول برای من سخت‌ترین بخش بود. چیزی که کمک کرد این بود که فقط به امروز فکر کنم، نه به «برای همیشه».', smokeFreeDays: 43, createdAt: now.subtract(const Duration(minutes: 24)), verifiedProgress: true, hopeCount: 128),
-      HopePost(id: 'seed-2', authorAlias: 'نفس آرام', message: 'پولی که قبلاً خرج سیگار می‌کردم رو کنار گذاشتم و بالاخره برای خودم یک هدفون خریدم. دیدن نتیجه واقعی خیلی انگیزه داد.', smokeFreeDays: 81, createdAt: now.subtract(const Duration(hours: 3)), verifiedProgress: true, savedMoneyToman: 6400000, goalTitle: 'هدفون', hopeCount: 214),
-      HopePost(id: 'seed-3', authorAlias: 'روز هفتم', message: 'امروز فقط روز هفتممه؛ اومدم بگم اگه روز اولی هستی، اون چند دقیقه هوس می‌گذره. واقعاً می‌گذره.', smokeFreeDays: 7, createdAt: now.subtract(const Duration(hours: 7)), verifiedProgress: true, hopeCount: 96),
-    ]);
-  }
+  @Deprecated('Use resetAllData')
+  void resetForDemo() => resetAllData();
+
+  @Deprecated('Use clearAllLocalData')
+  Future<void> clearSavedPreview() => clearAllLocalData();
+
 }
 
 void _restoreStringList(List<String> target, dynamic raw) {

@@ -45,10 +45,10 @@ class AboutScreen extends StatelessWidget {
                         ),
                       ],
                     ),
-                    child: const Icon(
-                      Icons.eco_rounded,
-                      color: NafasColors.primary,
-                      size: 40,
+                    clipBehavior: Clip.antiAlias,
+                    child: Image.asset(
+                      'assets/branding/nafas_app_icon_1024.png',
+                      fit: BoxFit.cover,
                     ),
                   ),
                   const SizedBox(height: 16),

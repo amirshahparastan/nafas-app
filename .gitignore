@@ -46,3 +46,10 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Nafas Android release signing (private)
+/android/key.properties
+/android/app/*.jks
+/android/app/*.keystore
+*.jks
+*.keystore

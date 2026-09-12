@@ -1,15 +1,14 @@
-name: Nafas Android Build
+name: Nafas Android Preview
 
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main
-      - master
+    branches: [main, master]
     paths:
       - "lib/**"
       - "assets/**"
       - "android/**"
+      - "web/**"
       - "pubspec.yaml"
       - ".github/workflows/android-build.yml"
   pull_request:
@@ -20,12 +19,12 @@ on:
       - "pubspec.yaml"
 
 concurrency:
-  group: android-build-${{ github.ref }}
+  group: android-preview-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
   build-android:
-    name: Build APK + AAB
+    name: Build preview APK
     runs-on: ubuntu-latest
     timeout-minutes: 45
 
@@ -47,11 +46,6 @@ jobs:
           channel: stable
           cache: true
 
-      - name: Flutter info
-        run: |
-          flutter --version
-          flutter doctor -v
-
       - name: Get dependencies
         run: flutter pub get
 
@@ -59,24 +53,13 @@ jobs:
         run: flutter analyze
         continue-on-error: true
 
-      - name: Build release APK
+      - name: Build preview APK
         run: flutter build apk --release
 
-      - name: Build release AAB
-        run: flutter build appbundle --release
-
-      - name: Upload APK
+      - name: Upload preview APK
         uses: actions/upload-artifact@v4
         with:
-          name: nafas-release-apk
+          name: nafas-v1-preview-apk
           path: build/app/outputs/flutter-apk/app-release.apk
-          if-no-files-found: error
-          retention-days: 14
-
-      - name: Upload AAB
-        uses: actions/upload-artifact@v4
-        with:
-          name: nafas-release-aab
-          path: build/app/outputs/bundle/release/app-release.aab
           if-no-files-found: error
           retention-days: 14

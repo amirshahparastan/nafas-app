@@ -16,7 +16,6 @@ import 'features/settings/feedback_screen.dart';
 import 'features/settings/notification_settings_screen.dart';
 import 'features/settings/privacy_policy_screen.dart';
 import 'features/settings/privacy_settings_screen.dart';
-import 'features/settings/public_profile_screen.dart';
 import 'features/settings/settings_screen.dart';
 import 'features/settings/smoking_settings_screen.dart';
 import 'features/settings/support_screen.dart';
@@ -71,7 +70,6 @@ class NafasApp extends StatelessWidget {
         '/smoking-settings': (_) => const SmokingSettingsScreen(),
         '/notification-settings': (_) => const NotificationSettingsScreen(),
         '/privacy-settings': (_) => const PrivacySettingsScreen(),
-        '/public-profile': (_) => const PublicProfileScreen(),
         '/feedback': (_) => const FeedbackScreen(),
         '/support': (_) => const SupportScreen(),
         '/about': (_) => const AboutScreen(),
@@ -125,7 +123,8 @@ class _StartupScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(28),
                   boxShadow: const [BoxShadow(color: Color(0x18083B34), blurRadius: 30, offset: Offset(0, 14))],
                 ),
-                child: const Icon(Icons.eco_rounded, color: NafasColors.primary, size: 44),
+                clipBehavior: Clip.antiAlias,
+                child: Image.asset('assets/branding/nafas_app_icon_1024.png', fit: BoxFit.cover),
               ),
               const SizedBox(height: 18),
               const NafasLogo(),

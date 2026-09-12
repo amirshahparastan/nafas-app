@@ -2,6 +2,7 @@
 import 'dart:html' as html;
 
 const bool supported = true;
+const bool supportsScheduling = false;
 
 Future<String> permissionStatus() async =>
     html.Notification.permission ?? 'default';
@@ -18,7 +19,15 @@ Future<bool> showTestNotification() async {
   if (html.Notification.permission != 'granted') return false;
   html.Notification(
     'نفس 🌱',
-    body: 'اعلان‌ها آماده‌اند؛ بدون شلوغی و فقط وقتی واقعاً به دردت می‌خورند.',
+    body: 'این یک اعلان آزمایشی از نفس است.',
   );
   return true;
 }
+
+Future<bool> scheduleDailySupportReminder({
+  required int hour,
+  required int minute,
+}) async =>
+    false;
+
+Future<void> cancelDailySupportReminder() async {}
