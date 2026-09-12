@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../core/state/app_state.dart';
+import 'package:flutter/services.dart';
+
+import '../../core/constants/product_info.dart';
+import '../../core/services/support_email.dart';
 import '../../core/theme/nafas_colors.dart';
 import '../../core/widgets/nafas_buttons.dart';
 import '../../core/widgets/rtl_app_bar.dart';
@@ -14,19 +17,16 @@ class FeedbackScreen extends StatefulWidget {
 class _FeedbackScreenState extends State<FeedbackScreen> {
   String category = 'پیشنهاد';
   final messageController = TextEditingController();
-  final contactController = TextEditingController();
   static const categories = ['پیشنهاد', 'گزارش مشکل', 'تجربه کاربری', 'محتوا', 'سایر'];
 
   @override
   void dispose() {
     messageController.dispose();
-    contactController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final state = NafasScope.of(context);
     return Scaffold(
       appBar: const RtlAppBar(title: 'انتقاد و پیشنهاد'),
       body: ListView(
@@ -34,38 +34,95 @@ class _FeedbackScreenState extends State<FeedbackScreen> {
         children: [
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(color: NafasColors.surfaceSoft, borderRadius: BorderRadius.circular(20)),
-            child: const Text('هر چیزی که باعث میشه نفس بهتر، ساده‌تر یا انسانی‌تر بشه برامون ارزشمنده. برای گزارش مشکل هم همین بخش رو استفاده کن.', style: TextStyle(height: 1.7, fontWeight: FontWeight.w700)),
+            decoration: BoxDecoration(
+              color: NafasColors.surfaceSoft,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: const Text(
+              'هر چیزی که باعث میشه نفس بهتر، ساده‌تر یا انسانی‌تر بشه برامون ارزشمنده. پیام از طریق برنامه ایمیل دستگاهت برای تیم PULSE آماده میشه و قبل از ارسال خودت می‌تونی متن نهایی رو ببینی.',
+              style: TextStyle(height: 1.7, fontWeight: FontWeight.w700),
+            ),
           ),
           const SizedBox(height: 16),
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: categories.map((item) => ChoiceChip(label: Text(item), selected: category == item, onSelected: (_) => setState(() => category = item))).toList(),
+            children: categories
+                .map(
+                  (item) => ChoiceChip(
+                    label: Text(item),
+                    selected: category == item,
+                    onSelected: (_) => setState(() => category = item),
+                  ),
+                )
+                .toList(),
           ),
           const SizedBox(height: 14),
-          TextField(controller: messageController, minLines: 5, maxLines: 8, decoration: const InputDecoration(labelText: 'پیامت', hintText: 'مشکل، پیشنهاد یا تجربه‌ات رو با جزئیات بنویس...')),
-          const SizedBox(height: 10),
-          TextField(controller: contactController, decoration: const InputDecoration(labelText: 'راه ارتباطی اختیاری', hintText: 'موبایل یا ایمیل، فقط اگر دوست داری پاسخ بگیری')),
+          TextField(
+            controller: messageController,
+            minLines: 5,
+            maxLines: 9,
+            decoration: const InputDecoration(
+              labelText: 'پیامت',
+              hintText: 'مشکل، پیشنهاد یا تجربه‌ات رو با جزئیات بنویس...',
+            ),
+          ),
           const SizedBox(height: 14),
           NafasPrimaryButton(
-            label: 'ارسال بازخورد',
-            icon: Icons.send_rounded,
-            onPressed: () {
-              if (messageController.text.trim().isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('اول متن بازخورد رو بنویس.')));
-                return;
-              }
-              state.addFeedback(category: category, message: messageController.text, contact: contactController.text);
-              messageController.clear();
-              contactController.clear();
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('بازخورد ثبت شد؛ اتصال سرور در فاز Backend فعال میشه.')));
-            },
+            label: 'ادامه در ایمیل',
+            icon: Icons.email_outlined,
+            onPressed: _prepareEmail,
           ),
           const SizedBox(height: 12),
-          Text('نسخه لانچ: نسخه اپ و اطلاعات فنی دستگاه فقط با رضایت کاربر به گزارش خطا اضافه می‌شود.', style: Theme.of(context).textTheme.bodySmall),
+          Container(
+            padding: const EdgeInsets.all(13),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(17),
+              border: Border.all(color: NafasColors.border),
+            ),
+            child: const Text(
+              'گیرنده: ${NafasProductInfo.supportEmail}\nاطلاعات دستگاه یا داده‌های ترک به‌صورت خودکار به پیام اضافه نمی‌شوند.',
+              style: TextStyle(
+                height: 1.7,
+                color: NafasColors.textSecondary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
         ],
       ),
     );
+  }
+
+  Future<void> _prepareEmail() async {
+    final message = messageController.text.trim();
+    if (message.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('اول متن بازخورد رو بنویس.')),
+      );
+      return;
+    }
+
+    final opened = await openNafasSupportEmail(
+      subject: '$category — اپلیکیشن نفس',
+      body: 'دسته‌بندی: $category\n\n$message\n\nنسخه برنامه: ${NafasProductInfo.version}',
+    );
+    if (!mounted) return;
+
+    if (!opened) {
+      await Clipboard.setData(
+        ClipboardData(
+          text:
+              'گیرنده: ${NafasProductInfo.supportEmail}\nموضوع: $category — اپلیکیشن نفس\n\n$message',
+        ),
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('برنامه ایمیل باز نشد؛ متن و آدرس پشتیبانی کپی شد.'),
+        ),
+      );
+    }
   }
 }

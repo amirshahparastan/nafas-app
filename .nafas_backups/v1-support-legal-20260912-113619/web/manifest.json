@@ -1,6 +1,6 @@
 {
-    "name": "نفس",
-    "short_name": "نفس",
+    "name": "nafas_app",
+    "short_name": "nafas_app",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

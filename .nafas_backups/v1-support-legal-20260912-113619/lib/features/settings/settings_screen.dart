@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../core/constants/product_info.dart';
 import '../../core/state/app_state.dart';
 import '../../core/theme/nafas_colors.dart';
 import '../../core/utils/formatters.dart';
@@ -42,18 +41,13 @@ class SettingsScreen extends StatelessWidget {
             _tile(Icons.lock_outline_rounded, 'حریم خصوصی و داده‌ها', 'همگام‌سازی، حذف حساب، خروجی داده و قفل برنامه', onTap: () => Navigator.pushNamed(context, '/privacy-settings')),
             const SizedBox(height: 14),
             _section('پشتیبانی'),
-            _tile(Icons.support_agent_rounded, 'تماس با پشتیبانی', NafasProductInfo.supportEmail, onTap: () => Navigator.pushNamed(context, '/support')),
             _tile(Icons.rate_review_outlined, 'انتقاد و پیشنهاد', 'پیشنهاد، گزارش مشکل یا تجربه کاربری', onTap: () => Navigator.pushNamed(context, '/feedback')),
             _tile(Icons.health_and_safety_outlined, 'اطلاعات سلامت', 'محتوای آموزشی؛ جایگزین توصیه پزشکی نیست', onTap: () => _healthInfo(context)),
-            const SizedBox(height: 14),
-            _section('درباره و قوانین'),
-            _tile(Icons.privacy_tip_outlined, 'سیاست حریم خصوصی', 'نحوه نگهداری و استفاده از داده‌های شما', onTap: () => Navigator.pushNamed(context, '/privacy-policy')),
-            _tile(Icons.description_outlined, 'قوانین استفاده', 'شرایط استفاده از اپلیکیشن نفس', onTap: () => Navigator.pushNamed(context, '/terms')),
-            _tile(Icons.info_outline_rounded, 'درباره نفس', 'نسخه ${NafasProductInfo.version} • PULSE', onTap: () => Navigator.pushNamed(context, '/about')),
+            _tile(Icons.info_outline_rounded, 'درباره نفس', 'نسخه ۰.۶.۰ • Launch Foundation', onTap: () => _about(context)),
             const SizedBox(height: 18),
             OutlinedButton(
               onPressed: () => _confirmReset(context, state),
-              child: const Text('شروع دوباره', style: TextStyle(color: NafasColors.danger)),
+              child: const Text('شروع دوباره نسخه آزمایشی', style: TextStyle(color: NafasColors.danger)),
             ),
           ],
         ),
@@ -142,6 +136,14 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
+  void _about(BuildContext context) {
+    showAboutDialog(
+      context: context,
+      applicationName: 'نفس',
+      applicationVersion: '0.6.0',
+      applicationLegalese: 'محصول فارسی‌اول برای حمایت از ترک سیگار و ساخت عادت‌های سالم‌تر.',
+    );
+  }
 
   void _confirmReset(BuildContext context, NafasAppState state) {
     showDialog(

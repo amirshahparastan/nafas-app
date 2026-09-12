@@ -10,17 +10,13 @@ import 'features/help/help_safety_screen.dart';
 import 'features/home/main_shell.dart';
 import 'features/journal/journal_screen.dart';
 import 'features/onboarding/onboarding_screen.dart';
-import 'features/settings/about_screen.dart';
 import 'features/settings/account_screen.dart';
 import 'features/settings/feedback_screen.dart';
 import 'features/settings/notification_settings_screen.dart';
-import 'features/settings/privacy_policy_screen.dart';
 import 'features/settings/privacy_settings_screen.dart';
 import 'features/settings/public_profile_screen.dart';
 import 'features/settings/settings_screen.dart';
 import 'features/settings/smoking_settings_screen.dart';
-import 'features/settings/support_screen.dart';
-import 'features/settings/terms_screen.dart';
 import 'features/slip/slip_screen.dart';
 
 class NafasBootstrap extends StatefulWidget {
@@ -73,10 +69,6 @@ class NafasApp extends StatelessWidget {
         '/privacy-settings': (_) => const PrivacySettingsScreen(),
         '/public-profile': (_) => const PublicProfileScreen(),
         '/feedback': (_) => const FeedbackScreen(),
-        '/support': (_) => const SupportScreen(),
-        '/about': (_) => const AboutScreen(),
-        '/privacy-policy': (_) => const PrivacyPolicyScreen(),
-        '/terms': (_) => const TermsScreen(),
         '/achievements': (_) => const AchievementsScreen(),
         '/slip': (_) => const SlipScreen(),
         '/calendar': (_) => const QuitCalendarScreen(),
