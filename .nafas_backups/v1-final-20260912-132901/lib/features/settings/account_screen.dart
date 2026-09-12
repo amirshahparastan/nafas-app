@@ -75,7 +75,7 @@ class _AccountScreenState extends State<AccountScreen> {
                     children: [
                       Text('در نسخه ۱.۰ حساب کاربری لازم نیست', style: TextStyle(fontWeight: FontWeight.w900)),
                       SizedBox(height: 4),
-                      Text('ورود با موبایل/گوگل و همگام‌سازی امن بین دستگاه‌ها در نسخه بعدی اضافه می‌شود. در نسخه ۱.۰ هیچ اطلاعات ورود از کاربر دریافت نمی‌شود.', style: TextStyle(height: 1.7, color: NafasColors.textSecondary)),
+                      Text('ورود با موبایل/Google و همگام‌سازی امن بین دستگاه‌ها در نسخه بعدی اضافه می‌شود. در نسخه ۱.۰ هیچ اطلاعات ورود از کاربر دریافت نمی‌شود.', style: TextStyle(height: 1.7, color: NafasColors.textSecondary)),
                     ],
                   ),
                 ),

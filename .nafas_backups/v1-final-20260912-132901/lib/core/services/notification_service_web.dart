@@ -31,5 +31,3 @@ Future<bool> scheduleDailySupportReminder({
     false;
 
 Future<void> cancelDailySupportReminder() async {}
-
-Future<bool> openNotificationSettings() async => false;

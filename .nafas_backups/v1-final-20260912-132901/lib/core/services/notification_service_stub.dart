@@ -1,5 +1,4 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
@@ -107,14 +106,4 @@ Future<bool> scheduleDailySupportReminder({
 Future<void> cancelDailySupportReminder() async {
   await _ensureInitialized();
   await _plugin.cancel(_dailyReminderId);
-}
-
-
-Future<bool> openNotificationSettings() async {
-  try {
-    const channel = MethodChannel('ir.wearepulse.nafas/settings');
-    return await channel.invokeMethod<bool>('openNotificationSettings') ?? false;
-  } catch (_) {
-    return false;
-  }
 }

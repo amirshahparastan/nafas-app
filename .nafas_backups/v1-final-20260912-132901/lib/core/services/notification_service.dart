@@ -12,8 +12,6 @@ abstract final class NafasNotificationService {
       impl.scheduleDailySupportReminder(hour: hour, minute: minute);
   static Future<void> cancelDailySupportReminder() =>
       impl.cancelDailySupportReminder();
-  static Future<bool> openNotificationSettings() =>
-      impl.openNotificationSettings();
   static bool get supported => impl.supported;
   static bool get supportsScheduling => impl.supportsScheduling;
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'core/state/app_state.dart';
 import 'core/theme/nafas_colors.dart';
 import 'core/theme/nafas_theme.dart';
@@ -59,12 +58,6 @@ class NafasApp extends StatelessWidget {
       title: 'نفس',
       theme: NafasTheme.light,
       locale: const Locale('fa', 'IR'),
-      supportedLocales: const [Locale('fa', 'IR')],
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
       builder: (context, child) => Directionality(
         textDirection: TextDirection.rtl,
         child: child ?? const SizedBox.shrink(),
@@ -126,7 +119,7 @@ class _StartupScreen extends StatelessWidget {
                 width: 82,
                 height: 82,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF0B4F43),
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(28),
                   boxShadow: const [BoxShadow(color: Color(0x18083B34), blurRadius: 30, offset: Offset(0, 14))],
                 ),

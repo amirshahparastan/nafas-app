@@ -255,7 +255,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
           const SizedBox(height: 10),
           NafasSecondaryButton(
-            label: 'درباره ذخیره و بازیابی اطلاعات',
+            label: 'قبلاً حساب داشتم / بازیابی اطلاعات',
             icon: Icons.cloud_download_outlined,
             onPressed: () => Navigator.pushNamed(context, '/account'),
           ),
@@ -423,7 +423,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   SizedBox(width: 9),
                   Expanded(
                     child: Text(
-                      'پیشرفتت به‌صورت خودکار روی همین دستگاه ذخیره می‌شه. بکاپ ابری و ورود حساب هنوز فعال نیست و قبل از انتشار آن قابلیت، سیاست حریم خصوصی به‌روزرسانی می‌شود.',
+                      'پیشرفتت به‌صورت خودکار روی همین دستگاه ذخیره می‌شه. اتصال حساب برای بکاپ ابری هم از تنظیمات در دسترسه.',
                       style: TextStyle(fontSize: 12.5, height: 1.65, fontWeight: FontWeight.w600),
                     ),
                   ),

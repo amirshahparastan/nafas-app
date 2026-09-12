@@ -68,7 +68,7 @@ class _PublicProfileScreenState extends State<PublicProfileScreen> {
           _switchCard(
             icon: Icons.verified_outlined,
             title: 'نمایش روزهای پاکی در پیام‌های جدید',
-            subtitle: 'نشان پیشرفت از داده واقعی داخل اپ ساخته می‌شود.',
+            subtitle: 'Badge پیشرفت از داده واقعی داخل اپ ساخته می‌شود.',
             value: shareProgress,
             onChanged: (value) => setState(() => shareProgress = value),
           ),

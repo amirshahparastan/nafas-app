@@ -37,7 +37,7 @@ class SettingsScreen extends StatelessWidget {
               Navigator.pop(context);
               state.setTab(3);
             }),
-            _tile(Icons.health_and_safety_outlined, 'اطلاعات سلامت', 'خط زمانی منبع‌دار بر اساس زمان ترک تو', onTap: () {
+            _tile(Icons.health_and_safety_outlined, 'اطلاعات سلامت', 'Timeline منبع‌دار بر اساس زمان ترک تو', onTap: () {
               Navigator.pop(context);
               state.setTab(1);
             }),
