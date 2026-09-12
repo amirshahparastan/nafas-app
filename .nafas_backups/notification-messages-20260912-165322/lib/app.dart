@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'core/state/app_state.dart';
-import 'core/services/notification_service.dart';
 import 'core/theme/nafas_colors.dart';
 import 'core/theme/nafas_theme.dart';
 import 'core/widgets/nafas_logo.dart';
@@ -37,18 +36,7 @@ class _NafasBootstrapState extends State<NafasBootstrap> {
   @override
   void initState() {
     super.initState();
-    _hydrateAndRefreshReminders();
-  }
-
-
-  Future<void> _hydrateAndRefreshReminders() async {
-    await state.hydrate();
-    if (state.remindersEnabled) {
-      await NafasNotificationService.scheduleDailySupportReminder(
-        hour: state.reminderHour,
-        minute: state.reminderMinute,
-      );
-    }
+    state.hydrate();
   }
 
   @override

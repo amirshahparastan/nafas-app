@@ -65,7 +65,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
               borderRadius: BorderRadius.circular(18),
             ),
             child: const Text(
-              'نسخه ۱.۰ فقط از یادآوری محلی و اختیاری استفاده می‌کند. هر روز یکی از ۴۰ پیام حمایتی به‌صورت چرخشی نمایش داده می‌شود و در یک چرخه ۴۰ روزه متن تکراری نداری. اعلان تبلیغاتی یا سروری فعال نیست و یادآوری‌ها بدون اینترنت هم کار می‌کنند.',
+              'نسخه ۱.۰ فقط از یادآوری محلی و اختیاری استفاده می‌کند. اعلان تبلیغاتی یا اعلان سروری در این نسخه فعال نیست و یادآوری روزانه بعد از زمان‌بندی بدون اینترنت هم کار می‌کند.',
               style: TextStyle(height: 1.7, fontWeight: FontWeight.w600),
             ),
           ),
@@ -215,13 +215,19 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
     if (!mounted) return;
     setState(() => _permission = value);
     if (value != 'granted') {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'مجوز اعلان فعال نشد. اگر قبلاً آن را رد کرده‌ای، «تنظیمات اعلان گوشی» را باز کن.',
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'مجوز اعلان فعال نشد. تنظیمات اعلان گوشی را باز کن و اجازه نفس را فعال کن.',
+            ),
           ),
-        ),
-      );
+        );
+      }
+      // In some Android skins (including some Samsung versions), after a
+      // previous denial Android no longer shows the permission dialog.
+      // Open the app notification settings as the reliable fallback.
+      await NafasNotificationService.openNotificationSettings();
     }
   }
 
