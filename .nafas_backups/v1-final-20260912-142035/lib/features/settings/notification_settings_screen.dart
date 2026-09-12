@@ -215,19 +215,13 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
     if (!mounted) return;
     setState(() => _permission = value);
     if (value != 'granted') {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'مجوز اعلان فعال نشد. تنظیمات اعلان گوشی را باز کن و اجازه نفس را فعال کن.',
-            ),
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'مجوز اعلان فعال نشد. اگر قبلاً آن را رد کرده‌ای، «تنظیمات اعلان گوشی» را باز کن.',
           ),
-        );
-      }
-      // In some Android skins (including some Samsung versions), after a
-      // previous denial Android no longer shows the permission dialog.
-      // Open the app notification settings as the reliable fallback.
-      await NafasNotificationService.openNotificationSettings();
+        ),
+      );
     }
   }
 
